@@ -3,34 +3,43 @@ var cities = [];
 
 $("#searchCity").on("click", function(event) {
     event.preventDefault();
+    var city = $("#cityInput").val().trim(); 
+    displayCityInfo(city);
+    renderButtons();
     
+});
 
+$(document).on("click", ".city", function(event){
+    var city = $(this).attr("data-name");
+    displayCityInfo(city);
+});
+
+function displayCityInfo(city) {
     $(".cityTitle").empty();
     $(".fiveDayForecast").empty();
-    $(".forecastTitle").empty();
-    var city = $("#cityInput").val();
+    $(".fiveDayForecastTitle").empty();
     console.log("City: " + city);
     var APIKey = "7c21203677410678d82df2cad2879047";
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
     
     cities.push(city);
-   
+    
     // AJAX call to the OpenWeatherMap API
     $.ajax({
     url: queryURL,
     method: "GET"
     })
     .then(function(response) {
-
+    
         console.log(queryURL);
         console.log(response);
-
+    
         var title = $('<h1>');
         var currentDate = moment().format('L');
         var weatherIcon = $('<i>');
-
+    
         console.log("currentDate: " + currentDate);
-
+    
         //get correct weather icon
         if(response.weather[0].main === "Clouds"){
             weatherIcon.attr("class", "fas fa-cloud");
@@ -49,13 +58,15 @@ $("#searchCity").on("click", function(event) {
         } else if (response.weather[0].main === "Clear"){
             weatherIcon.attr("class", "fas fa-sun");
         };
-
-
+    
+    
         //put title with city date and weather icon on the page
         title.text(city + " " + currentDate + " ");
         title.append(weatherIcon);
         $(".cityTitle").append(title);
-
+        city = city.replace(/\s/g,'+'); 
+        console.log("New City String: " + city);
+    
         //get the temp and display on the page (temp already in F)
         var temperatureInFahrenheit = (response.main.temp).toFixed(2);
         console.log("Temp in F: " + temperatureInFahrenheit);
@@ -69,14 +80,14 @@ $("#searchCity").on("click", function(event) {
         var humidity = $('<p>');
         humidity.text("Humidity: " + currentHumidity + "%");
         $(".cityTitle").append(humidity);
-
+    
         //get the windspeed and display on the page
         var windSpeed = response.wind.speed;
         console.log("Wind Speed: " + windSpeed);
         var wind = $('<p>');
         wind.text("Wind Speed: " + windSpeed + " MPH");
         $(".cityTitle").append(wind);
-
+    
         //get the UV Index and display on the page
         var UVURL = "http://api.openweathermap.org/data/2.5/uvi?appid=" + APIKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon;
         $.ajax({
@@ -110,79 +121,73 @@ $("#searchCity").on("click", function(event) {
                 UVIndex.append(UVBox);
                 $(".cityTitle").append(UVIndex);
             });
-    });
-
-    var fiveDayForecastURL = "https://api.openweathermap.org/data/2.5/find?q=" + city + "&units=imperial&appid=" + APIKey;
-    
-    // AJAX call to the OpenWeatherMap API for five day forecast
-    $.ajax({
-    url: fiveDayForecastURL,
-    method: "GET"
-    })
-    .then(function(response) {
-        console.log(JSON.stringify(response));
-        var forecastTitle =  $('<h2>');
-        forecastTitle.text("5-Day Forecast: ");
-        $(".fiveDayForecastTitle").append(forecastTitle);
-        //create five day forecast
-        //include date at the top; icon of the weather, temp, and humidity
-        for(var i = 0; i < 5; i++){
-            var forecast = $('<div>');
-            forecast.attr("style", "background-color: #0066ff; color: white; font-size: 14px; margin-right: 10px; margin-left: 10px; margin-bottom: 10px");
-            forecast.attr("class", "col-md-2 col-sm-6");
-
-            //adding date to the top of the forecast
-            var nextDate = $('<h6>');
-            nextDate.text(moment().add(i + 1, 'days').format('L')); 
-            forecast.append(nextDate);
-
-            console.log(response.list[i].weather[0].main);
-            console.log(response.list[i].main.temp);
-            console.log(response.list[i].main.humidity);
-
-            var nextWeatherIcon = $('<i>');
-            //get correct weather icon
-            if(response.list[i].weather[0].main === "Clouds"){
-                nextWeatherIcon.attr("class", "fas fa-cloud");
-            } else if (response.list[i].weather[0].main === "Rain"){
-                nextWeatherIcon.attr("class", "fas fa-cloud-showers-heavy");
-            } else if (response.list[i].weather[0].main === "Thunderstorm"){
-                nextWeatherIcon.attr("class", "fas fa-bolt");
-            } else if (response.list[i].weather[0].main === "Drizzle"){
-                nextWeatherIcon.attr("class", "fas fa-cloud-rain");
-            } else if (response.list[i].weather[0].main === "Snow"){
-                nextWeatherIcon.attr("class", "fas fa-snowflake");
-            } else if (response.list[i].weather[0].main === "Mist" || response.list[i].weather[0].main === "Smoke" || response.list[i].weather[0].main === "Haze" || response.list[i].weather[0].main === "Dust" || response.list[i].weather[0].main === "Fog" || response.list[i].weather[0].main === "Sand" || response.list[i].weather[0].main === "Ash"){
-                nextWeatherIcon.attr("class", "fas fa-smog");
-            } else if (response.list[i].weather[0].main === "Squall" || response.list[i].weather[0].main === "Tornado"){
-                nextWeatherIcon.attr("class", "fas fa-wind");
-            } else if (response.list[i].weather[0].main === "Clear"){
-                nextWeatherIcon.attr("class", "fas fa-sun");
-            };
-            forecast.append(nextWeatherIcon);
-
-            //temperature
-            var nextTemp = $('<p>');
-            nextTemp.text("Temperature: " + response.list[i].main.temp + "°F");
-            forecast.append(nextTemp);
-
-            //humidity
-            var nextHumidity = $('<p>');
-            nextHumidity.text("Humidity: " + response.list[i].main.humidity + "%");
-            forecast.append(nextHumidity);
             
-            //put all the information onto the page
-            $(".fiveDayForecast").append(forecast);
-        }
+            var fiveDayForecastURL = "https://api.openweathermap.org/data/2.5/find?q=" + city + "&units=imperial&appid=" + APIKey;
+            
+            // AJAX call to the OpenWeatherMap API for five day forecast
+            $.ajax({
+                url: fiveDayForecastURL,
+                method: "GET"
+            })
+            .then(function(response) {
+                console.log(JSON.stringify(response));
+                var forecastTitle =  $('<h2>');
+                forecastTitle.text("5-Day Forecast: ");
+                $(".fiveDayForecastTitle").append(forecastTitle);
+                //create five day forecast
+                //include date at the top; icon of the weather, temp, and humidity
+                for(var i = 0; i < 5; i++){
+                    var forecast = $('<div>');
+                    forecast.attr("style", "background-color: #0066ff; color: white; font-size: 14px; margin-right: 10px; margin-left: 10px; margin-bottom: 10px");
+                    forecast.attr("class", "col-md-2 col-sm-6");
+                    
+                    //adding date to the top of the forecast
+                    var nextDate = $('<h6>');
+                    nextDate.text(moment().add(i + 1, 'days').format('L')); 
+                    forecast.append(nextDate);
+                    
+                    console.log(response.list[i].weather[0].main);
+                    console.log(response.list[i].main.temp);
+                    console.log(response.list[i].main.humidity);
+                    
+                    var nextWeatherIcon = $('<i>');
+                    //get correct weather icon
+                    if(response.list[i].weather[0].main === "Clouds"){
+                        nextWeatherIcon.attr("class", "fas fa-cloud");
+                    } else if (response.list[i].weather[0].main === "Rain"){
+                        nextWeatherIcon.attr("class", "fas fa-cloud-showers-heavy");
+                    } else if (response.list[i].weather[0].main === "Thunderstorm"){
+                        nextWeatherIcon.attr("class", "fas fa-bolt");
+                    } else if (response.list[i].weather[0].main === "Drizzle"){
+                        nextWeatherIcon.attr("class", "fas fa-cloud-rain");
+                    } else if (response.list[i].weather[0].main === "Snow"){
+                        nextWeatherIcon.attr("class", "fas fa-snowflake");
+                    } else if (response.list[i].weather[0].main === "Mist" || response.list[i].weather[0].main === "Smoke" || response.list[i].weather[0].main === "Haze" || response.list[i].weather[0].main === "Dust" || response.list[i].weather[0].main === "Fog" || response.list[i].weather[0].main === "Sand" || response.list[i].weather[0].main === "Ash"){
+                        nextWeatherIcon.attr("class", "fas fa-smog");
+                    } else if (response.list[i].weather[0].main === "Squall" || response.list[i].weather[0].main === "Tornado"){
+                        nextWeatherIcon.attr("class", "fas fa-wind");
+                    } else if (response.list[i].weather[0].main === "Clear"){
+                        nextWeatherIcon.attr("class", "fas fa-sun");
+                    };
+                    forecast.append(nextWeatherIcon);
+                    
+                    //temperature
+                    var nextTemp = $('<p>');
+                    nextTemp.text("Temperature: " + response.list[i].main.temp + "°F");
+                    forecast.append(nextTemp);
+                    
+                    //humidity
+                    var nextHumidity = $('<p>');
+                    nextHumidity.text("Humidity: " + response.list[i].main.humidity + "%");
+                    forecast.append(nextHumidity);
+                    
+                    //put all the information onto the page
+                    $(".fiveDayForecast").append(forecast);
+                }
+            });
     });
 
-
-    renderButtons();
-    
-    //$(document).on("click", ".city", displayCityInfo);
-  
-});
-
+};
 
 // Function for creating new search buttons
 function renderButtons() {
