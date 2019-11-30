@@ -1,9 +1,16 @@
-var cities = [];
 
 
 $("#searchCity").on("click", function(event) {
     event.preventDefault();
     var city = $("#cityInput").val().trim(); 
+    var cities = JSON.parse(localStorage.getItem("savedCities"));
+    console.log("Cities: " + cities);
+    if (cities != null) {
+        cities.push(city);
+    } else {
+        cities = [city];
+    }
+    localStorage.setItem("savedCities", JSON.stringify(cities));
     displayCityInfo(city);
     renderButtons();
     
@@ -21,8 +28,6 @@ function displayCityInfo(city) {
     console.log("City: " + city);
     var APIKey = "7c21203677410678d82df2cad2879047";
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
-    
-    cities.push(city);
     
     // AJAX call to the OpenWeatherMap API
     $.ajax({
@@ -189,9 +194,14 @@ function displayCityInfo(city) {
 
 };
 
+renderButtons();
+
 // Function for creating new search buttons
 function renderButtons() {
-
+    cities = JSON.parse(localStorage.getItem("savedCities"));
+    if (cities === null || cities === undefined){
+        return;
+    }
     // Deleting the buttons prior to adding new cities
     $("#previousSearch").empty();
         // Looping through the array of cities
