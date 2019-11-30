@@ -6,7 +6,12 @@ $("#searchCity").on("click", function(event) {
     var cities = JSON.parse(localStorage.getItem("savedCities"));
     console.log("Cities: " + cities);
     if (cities != null) {
-        cities.push(city);
+        //prevent duplicates from being added to the array
+        for (var i = 0; i < cities.length; i++){
+            if (cities.indexOf(city) === -1) {
+                cities.push(city);  
+            }
+        }
     } else {
         cities = [city];
     }
@@ -25,6 +30,8 @@ function displayCityInfo(city) {
     $(".cityTitle").empty();
     $(".fiveDayForecast").empty();
     $(".fiveDayForecastTitle").empty();
+    $("#cityInput").val("");
+    
     console.log("City: " + city);
     var APIKey = "7c21203677410678d82df2cad2879047";
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
