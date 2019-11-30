@@ -1,5 +1,10 @@
+var cities = [];
+
+
 $("#searchCity").on("click", function(event) {
     event.preventDefault();
+    
+
     $(".cityTitle").empty();
     $(".fiveDayForecast").empty();
     $(".forecastTitle").empty();
@@ -8,6 +13,8 @@ $("#searchCity").on("click", function(event) {
     var APIKey = "7c21203677410678d82df2cad2879047";
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
     
+    cities.push(city);
+   
     // AJAX call to the OpenWeatherMap API
     $.ajax({
     url: queryURL,
@@ -169,5 +176,32 @@ $("#searchCity").on("click", function(event) {
         }
     });
 
-    //create new button, add in that other function from the movie one that prevents issues
+
+    renderButtons();
+    
+    //$(document).on("click", ".city", displayCityInfo);
+  
 });
+
+
+// Function for creating new search buttons
+function renderButtons() {
+
+    // Deleting the buttons prior to adding new cities
+    $("#previousSearch").empty();
+        // Looping through the array of cities
+        console.log("Cities: " + cities);
+        for (var i = 0; i < cities.length; i++) {
+
+          // Then dynamicaly generating buttons for each city in the array
+          var a = $("<button>");
+          // Adding a class of movie to our button
+          a.addClass("city btn btn-outline-secondary btn-block");
+          // Adding a data-attribute
+          a.attr("data-name", cities[i]);
+          // Providing the initial button text
+          a.text(cities[i]);
+          // Adding the button to the buttons-view div
+          $("#previousSearch").append(a);
+        }
+      }
