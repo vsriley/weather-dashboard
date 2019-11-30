@@ -2,6 +2,7 @@ $("#searchCity").on("click", function(event) {
     event.preventDefault();
     $(".cityTitle").empty();
     $(".fiveDayForecast").empty();
+    $(".forecastTitle").empty();
     var city = $("#cityInput").val();
     console.log("City: " + city);
     var APIKey = "7c21203677410678d82df2cad2879047";
@@ -40,7 +41,7 @@ $("#searchCity").on("click", function(event) {
             weatherIcon.attr("class", "fas fa-wind");
         } else if (response.weather[0].main === "Clear"){
             weatherIcon.attr("class", "fas fa-sun");
-        }
+        };
 
 
         //put title with city date and weather icon on the page
@@ -48,7 +49,7 @@ $("#searchCity").on("click", function(event) {
         title.append(weatherIcon);
         $(".cityTitle").append(title);
 
-        //get the temp and display on the page (temp already in F?)
+        //get the temp and display on the page (temp already in F)
         var temperatureInFahrenheit = (response.main.temp).toFixed(2);
         console.log("Temp in F: " + temperatureInFahrenheit);
         var temperature = $('<p>');
@@ -81,19 +82,19 @@ $("#searchCity").on("click", function(event) {
                 var UVBox = $("<span>");
                 if (UV < 3){
                     //low UV
-                    UVBox.attr("style", "background-color: green; width: 60px; text-align: center");
+                    UVBox.attr("style", "background-color: green; padding: 5px; text-align: center; color: white");
                 } else if (UV >= 3 && UV < 6){
                     //moderate UV
-                    UVBox.attr("style", "background-color: yellow; width: 60px; text-align: center");
+                    UVBox.attr("style", "background-color: yellow; padding: 5px; text-align: center");
                 } else if (UV >= 7 && UV < 8){
                     //high UV
-                    UVBox.attr("style", "background-color: orange; width: 60px; text-align: center");
+                    UVBox.attr("style", "background-color: orange; padding: 5px; text-align: center");
                 } else if (UV >= 8 && UV < 11){
                     //very high UV
-                    UVBox.attr("style", "background-color: red; width: 60px; text-align: center");
+                    UVBox.attr("style", "background-color: red; padding: 5px; text-align: center; color: white");
                 } else if (UV >= 11){
                     //extreme UV
-                    UVBox.attr("style", "background-color: purple; width: 60px; text-align: center");
+                    UVBox.attr("style", "background-color: purple; padding: 5px; text-align: center; color: white");
                 };
                 UVBox.text(UV);
                 var UVIndexText = "UV Index: ";
@@ -102,7 +103,71 @@ $("#searchCity").on("click", function(event) {
                 UVIndex.append(UVBox);
                 $(".cityTitle").append(UVIndex);
             });
-        
-
     });
+
+    var fiveDayForecastURL = "https://api.openweathermap.org/data/2.5/find?q=" + city + "&units=imperial&appid=" + APIKey;
+    
+    // AJAX call to the OpenWeatherMap API for five day forecast
+    $.ajax({
+    url: fiveDayForecastURL,
+    method: "GET"
+    })
+    .then(function(response) {
+        console.log(JSON.stringify(response));
+        var forecastTitle =  $('<h2>');
+        forecastTitle.text("5-Day Forecast: ");
+        $(".fiveDayForecastTitle").append(forecastTitle);
+        //create five day forecast
+        //include date at the top; icon of the weather, temp, and humidity
+        for(var i = 0; i < 5; i++){
+            var forecast = $('<div>');
+            forecast.attr("style", "background-color: #0066ff; color: white; font-size: 14px; margin-right: 10px; margin-left: 10px; margin-bottom: 10px");
+            forecast.attr("class", "col-md-2 col-sm-6");
+
+            //adding date to the top of the forecast
+            var nextDate = $('<h6>');
+            nextDate.text(moment().add(i + 1, 'days').format('L')); 
+            forecast.append(nextDate);
+
+            console.log(response.list[i].weather[0].main);
+            console.log(response.list[i].main.temp);
+            console.log(response.list[i].main.humidity);
+
+            var nextWeatherIcon = $('<i>');
+            //get correct weather icon
+            if(response.list[i].weather[0].main === "Clouds"){
+                nextWeatherIcon.attr("class", "fas fa-cloud");
+            } else if (response.list[i].weather[0].main === "Rain"){
+                nextWeatherIcon.attr("class", "fas fa-cloud-showers-heavy");
+            } else if (response.list[i].weather[0].main === "Thunderstorm"){
+                nextWeatherIcon.attr("class", "fas fa-bolt");
+            } else if (response.list[i].weather[0].main === "Drizzle"){
+                nextWeatherIcon.attr("class", "fas fa-cloud-rain");
+            } else if (response.list[i].weather[0].main === "Snow"){
+                nextWeatherIcon.attr("class", "fas fa-snowflake");
+            } else if (response.list[i].weather[0].main === "Mist" || response.list[i].weather[0].main === "Smoke" || response.list[i].weather[0].main === "Haze" || response.list[i].weather[0].main === "Dust" || response.list[i].weather[0].main === "Fog" || response.list[i].weather[0].main === "Sand" || response.list[i].weather[0].main === "Ash"){
+                nextWeatherIcon.attr("class", "fas fa-smog");
+            } else if (response.list[i].weather[0].main === "Squall" || response.list[i].weather[0].main === "Tornado"){
+                nextWeatherIcon.attr("class", "fas fa-wind");
+            } else if (response.list[i].weather[0].main === "Clear"){
+                nextWeatherIcon.attr("class", "fas fa-sun");
+            };
+            forecast.append(nextWeatherIcon);
+
+            //temperature
+            var nextTemp = $('<p>');
+            nextTemp.text("Temperature: " + response.list[i].main.temp + "°F");
+            forecast.append(nextTemp);
+
+            //humidity
+            var nextHumidity = $('<p>');
+            nextHumidity.text("Humidity: " + response.list[i].main.humidity + "%");
+            forecast.append(nextHumidity);
+            
+            //put all the information onto the page
+            $(".fiveDayForecast").append(forecast);
+        }
+    });
+
+    //create new button, add in that other function from the movie one that prevents issues
 });
