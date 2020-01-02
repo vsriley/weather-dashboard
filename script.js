@@ -101,7 +101,7 @@ function displayCityInfo(city) {
         $(".cityTitle").append(wind);
     
         //get the UV Index and display on the page
-        var UVURL = "http://api.openweathermap.org/data/2.5/uvi?appid=" + APIKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon;
+        var UVURL = "https://api.openweathermap.org/data/2.5/uvi?appid=" + APIKey + "&lat=" + response.coord.lat + "&lon=" + response.coord.lon;
         $.ajax({
             url: UVURL,
             method: "GET"
