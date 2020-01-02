@@ -134,7 +134,7 @@ function displayCityInfo(city) {
                 $(".cityTitle").append(UVIndex);
             });
             
-            var fiveDayForecastURL = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&mode=JSON&units=imperial&appid=" + APIKey;
+            var fiveDayForecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&mode=JSON&units=imperial&appid=" + APIKey;
 
             // AJAX call to the OpenWeatherMap API for five day forecast
             $.ajax({
