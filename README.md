@@ -19,8 +19,6 @@ To utilize the project, open in your internet browser.
 The project provides the user a method to search the weather of various cities throughout the world.  The user inputs a city and the weather data is displayed on the screen.
 Past searches are present as buttons the user can also click to view the cooresponding weather.
 
-## Credits
-
 
 ## License
 
