@@ -12,7 +12,7 @@ After some research I figured out to set the arrays first value to the city if t
 ## Installation
 
 To utilize the project, open in your internet browser.
-
+[Project] (https://vsriley.github.io/weather-dashboard/)
 
 ## Usage 
 

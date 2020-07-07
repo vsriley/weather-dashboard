@@ -227,3 +227,4 @@ function renderButtons() {
           $("#previousSearch").append(a);
         }
       }
+
